@@ -380,7 +380,7 @@ public class MainActivity extends Activity implements FragmentManager.OnBackStac
     @Override
     protected void onResume() {
         super.onResume();
-        if(getFragmentManager().getBackStackEntryCount() >= 1) {
+        if(getFragmentManager().getBackStackEntryCount() > 0) {
             mShowingMain = true;
         } else {
             mShowingMain = false;
