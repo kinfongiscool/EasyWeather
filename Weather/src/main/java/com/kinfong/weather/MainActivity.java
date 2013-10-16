@@ -370,7 +370,8 @@ public class MainActivity extends Activity implements FragmentManager.OnBackStac
         public void onServiceConnected(ComponentName className, IBinder binder) {
             mBoundService = ( (LocationService.LocationBinder) binder).getService();
 
-            mBoundService.doRetrieveLocation();
+            Intent intent = new Intent("doRetrieveLocation");
+            sendBroadcast(intent);
         }
         public void onServiceDisconnected(ComponentName className) {
             mBoundService = null;

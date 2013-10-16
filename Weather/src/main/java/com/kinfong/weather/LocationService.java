@@ -1,8 +1,10 @@
 package com.kinfong.weather;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Binder;
@@ -18,6 +20,8 @@ public class LocationService extends Service {
     private static final float LOCATION_DISTANCE = 10f;
 
     private static Location mLocation;
+
+    private BroadcastReceiver mLocationServiceReceiver;
 
     private class LocationListener implements android.location.LocationListener{
 
@@ -71,6 +75,8 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         initializeLocationManager();
+        mLocationServiceReceiver = new LocationServiceReceiver();
+        registerReceiver(mLocationServiceReceiver, new IntentFilter("doRetrieveLocation"));
         if(checkGPSEnabled()) {
             try {
                 mLocationManager.requestLocationUpdates(
@@ -88,14 +94,15 @@ public class LocationService extends Service {
             }
 
         } else {
-            Intent intent = new Intent("showGpsDialog");
-            sendBroadcast(intent);
+            Intent gpsIntent = new Intent("showGpsDialog");
+            sendBroadcast(gpsIntent);
         }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mLocationServiceReceiver);
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {
@@ -114,6 +121,13 @@ public class LocationService extends Service {
 
     private boolean checkGPSEnabled() {
         return mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    public class LocationServiceReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            doRetrieveLocation();
+        }
     }
 
     /**
